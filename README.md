@@ -3,8 +3,8 @@ x-vits
 
 Some modification version of PeriodVITS.
 - PeriodVITS
-    - +deberta feature to text encoder
-    - +style encoder with style diffusion
+    - +deberta hidden representations to text encoder
+    - +style encoder with style diffusion like StyleTTS2
     - +multi-stream bigvgan with bigvgan-v1 discriminator
 
 
