@@ -1,7 +1,9 @@
 x-vits
 ===
 
-Some modification version of PeriodVITS.
+This repository contains some experiments about VITS.
+
+Main model is some modification version of PeriodVITS.
 - PeriodVITS
     - +deberta hidden representations to text encoder
     - +style encoder with style diffusion like StyleTTS2
@@ -13,6 +15,14 @@ Now only supports JSUT corpus.
 
 # Citations
 ```
+@inproceedings{kim2021conditional,
+  title={Conditional variational autoencoder with adversarial learning for end-to-end text-to-speech},
+  author={Kim, Jaehyeon and Kong, Jungil and Son, Juhee},
+  booktitle={International Conference on Machine Learning},
+  pages={5530--5540},
+  year={2021},
+  organization={PMLR}
+}
 @inproceedings{shirahata2023period,
   title={Period vits: Variational inference with explicit pitch modeling for end-to-end emotional speech synthesis},
   author={Shirahata, Yuma and Yamamoto, Ryuichi and Song, Eunwoo and Terashima, Ryo and Kim, Jae-Min and Tachibana, Kentaro},
