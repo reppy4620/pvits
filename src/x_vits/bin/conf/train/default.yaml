@@ -1,0 +1,21 @@
+seed: 42
+
+num_steps: 1000000
+save_ckpt_interval: 100000
+
+batch_size: 8
+num_workers: 4
+
+loss_coef:
+  mel: 45.0
+  stft: 1.0
+  fm: 2.0
+  kl: 1.0
+
+grad_acc_step: 1
+
+frame_segment_size: 32
+sample_segment_size: 7680  # frame_segment_size * hop_length
+
+trainer_args:
+  precision: 16-mixed

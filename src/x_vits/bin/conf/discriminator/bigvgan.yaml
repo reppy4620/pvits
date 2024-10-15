@@ -1,0 +1,4 @@
+_target_: x_vits.models.discriminator.CombinedDiscriminator
+discriminators:
+  - _target_: x_vits.models.discriminator.MultiPeriodDiscriminator
+  - _target_: x_vits.models.discriminator.MultiResolutionDiscriminator

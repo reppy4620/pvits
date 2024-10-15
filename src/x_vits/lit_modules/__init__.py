@@ -1,0 +1,1 @@
+from .xvits import XVITSModule

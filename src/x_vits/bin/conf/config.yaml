@@ -1,0 +1,31 @@
+defaults:
+  - _self_
+  - path: default
+  - train: default
+  - mel: default
+  - generator: xvits
+  - discriminator: bigvgan
+  - dataset: single
+  - optimizer: adamw
+  - scheduler: exponential
+  - lit_module: xvits
+  - override hydra/job_logging: disabled
+  - override hydra/hydra_logging: disabled
+
+hydra:
+  run:
+    dir: ./
+  output_subdir: null
+
+preprocess:
+  type: JSUT
+  overwrite: true
+  n_jobs: 8
+  sil_sec: 0.02
+
+train:
+  out_dir: ./out
+
+syn:
+  out_dir: ./out
+  ckpt_path: null
