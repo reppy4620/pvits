@@ -1,7 +1,7 @@
 x-vits
 ===
 
-This repo contains experiments about VITS.
+This repo contains experiments for confirming performance of PeriodVITS.
 
 Main model is some modification version of PeriodVITS.
 - PeriodVITS
