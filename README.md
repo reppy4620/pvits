@@ -1,17 +1,16 @@
-x-vits
+x-vits(WIP)
 ===
 
-This repo contains experiments for confirming performance of PeriodVITS.
+This repo contains experiments for confirming performance of PeriodVITS.  
+Now only supports JSUT corpus.
 
 Main model is some modification version of PeriodVITS.
 - PeriodVITS
-    - +deberta hidden representations to text encoder
-    - +style encoder with style diffusion like StyleTTS2
+    - +deberta hidden representations to text encoder incorporated with cross attention
+    - +style encoder with style diffusion like StyleTTS2 but not using AdaLN now
     - +multi-stream bigvgan with bigvgan-v1 discriminator
 
-
-Now only supports JSUT corpus.
-
+**Note that the generated speech is not audible, but I cannot find the cause.**
 
 # Citations
 ```

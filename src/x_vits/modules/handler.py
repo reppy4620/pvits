@@ -45,9 +45,9 @@ class DurationHandler(nn.Module):
         duration = log_duration_pred.exp().round()
         y_lengths = duration.sum(dim=[1, 2]).clamp_min(1).long()
         y_mask = length_to_mask(y_lengths).unsqueeze(1).to(x_mask.dtype)
-        attn_mask = x_mask.unsqueeze(2) * y_mask.unsqueeze(-1)
+        attn_mask = (x_mask.unsqueeze(-1) * y_mask.unsqueeze(2)).squeeze(1)
         attn = generate_path(duration, attn_mask)
-        x_frame = attn @ x
+        x_frame = x @ attn
         output = DurationHandlerOutput(
             x_frame=x_frame,
             p_attn=attn,

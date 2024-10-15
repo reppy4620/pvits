@@ -4,6 +4,7 @@ from .discriminator import (
     MultiResolutionDiscriminator,
     MultiScaleDiscriminator,
 )
+from .period_vits import PeriodVITS
 from .xvits import XVITS
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "MultiResolutionDiscriminator",
     "CombinedDiscriminator",
     "MultiPeriodDiscriminator",
+    "PeriodVITS",
 ]

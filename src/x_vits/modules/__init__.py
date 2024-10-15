@@ -12,7 +12,7 @@ from .handler import (
 )
 from .predictor import VariancePredictor
 from .transformer import AdaTransformerBlock, TransformerBlock
-from .vocoder import XVocoder
+from .vocoder import BigVGAN, XVocoder
 
 __all__ = [
     "AlignmentModule",
@@ -35,5 +35,6 @@ __all__ = [
     "VariancePredictor",
     "AdaTransformerBlock",
     "TransformerBlock",
+    "BigVGAN",
     "XVocoder",
 ]

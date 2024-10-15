@@ -35,7 +35,6 @@ class TransformerTextEncoder(nn.Module):
             context_mask = None
             xattn_mask = None
         for layer in self.layers:
-            # breakpoint()
             x = layer(
                 x,
                 mask,
@@ -45,7 +44,6 @@ class TransformerTextEncoder(nn.Module):
             )
         x = self.out_layer(x) * mask
         x, mask = x.transpose(1, 2), mask.transpose(1, 2)
-        # breakpoint()
         return x, mask
 
 

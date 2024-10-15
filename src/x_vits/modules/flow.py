@@ -34,7 +34,7 @@ class VolumePreservingFlow(nn.Module):
             x = flow(x, mask, cond)
         return x
 
-    def backward(self, x, mask, cond=None):
+    def reverse(self, x, mask, cond=None):
         for flow in reversed(self.flows):
             x = flow.reverse(x, mask, cond)
         return x
@@ -44,7 +44,7 @@ class FlowLayer(nn.Module):
     def forward(self, *args, **kwargs):
         raise NotImplementedError
 
-    def backward(self, *args, **kwargs):
+    def reverse(self, *args, **kwargs):
         raise NotImplementedError
 
 
@@ -53,7 +53,7 @@ class Flip(FlowLayer):
         x = torch.flip(x, [1])
         return x
 
-    def backward(self, x, *args, **kwargs):
+    def reverse(self, x, *args, **kwargs):
         return self(x)
 
 
@@ -99,7 +99,7 @@ class ResidualCouplingLayer(FlowLayer):
         x = torch.cat([x0, x1], dim=1)
         return x
 
-    def backward(self, x, mask, cond=None, *args, **kwargs):
+    def reverse(self, x, mask, cond=None, *args, **kwargs):
         x0, x1, m, logs = self._calc_stats(x, mask, cond)
         x1 = (x1 - m) * torch.exp(-logs) * mask
         x = torch.cat([x0, x1], 1)
