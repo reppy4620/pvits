@@ -93,12 +93,7 @@ class PeriodVITS(nn.Module):
         _, x, *_, raw_text = inputs
         x = x.unsqueeze(0).to(device)
         x_lengths = torch.tensor([x.shape[-1]], dtype=torch.long, device=device)
-        context, context_lengths = (
-            self.context_embedder([raw_text]) if self.context_embedder else (None, None)
-        )
-        x, x_mask = self.text_encoder(
-            x, x_lengths, context=context, context_lengths=context_lengths
-        )
+        x, x_mask = self.text_encoder(x, x_lengths)
 
         x_frame, p_attn, duration, y_mask, _ = self.duration_handler.infer(x, x_mask)
 

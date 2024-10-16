@@ -6,17 +6,25 @@ import torch
 import torchaudio
 from torch.utils.data import Dataset
 
-from x_vits.frontend.ja import text_to_sequence
+from x_vits.frontend.en import text_to_sequence as text_to_sequence_en
+from x_vits.frontend.ja import text_to_sequence as text_to_sequence_ja
+from x_vits.utils.const import LANGUAGE
 from x_vits.utils.logging import logger
 
 
 class SingleSpeakerDataset(Dataset):
-    def __init__(self, df_file, wav_dir, cf0_dir, vuv_dir, spec_tfm):
+    def __init__(self, df_file, wav_dir, cf0_dir, vuv_dir, spec_tfm, language="JA"):
         logger.info(f"Loading dataset... : {df_file}")
         self.wav_dir = Path(wav_dir)
         self.cf0_dir = Path(cf0_dir)
         self.vuv_dir = Path(vuv_dir)
         self.spec_tfm = spec_tfm
+        if LANGUAGE.from_str(language) == LANGUAGE.JAPANESE:
+            self.text_to_sequence = text_to_sequence_ja
+        elif LANGUAGE.from_str(language) == LANGUAGE.ENGLISH:
+            self.text_to_sequence = text_to_sequence_en
+        else:
+            raise ValueError(f"Invalid language: {language}")
 
         df = pd.read_csv(df_file)
         self.data = df.values.tolist()
@@ -28,7 +36,7 @@ class SingleSpeakerDataset(Dataset):
         fname, phoneme_str, duration_str, _, raw_text = self.data[idx]
         bname = Path(fname).stem
 
-        phoneme = text_to_sequence(phoneme_str.split())
+        phoneme = self.text_to_sequence(phoneme_str)
         phoneme = torch.tensor(phoneme, dtype=torch.long)
 
         duration = [int(d) for d in duration_str.split()]

@@ -212,6 +212,8 @@ def text_to_sequence(text):
         >>> text_to_sequence(["^", "m", "i", "[", "z","o", "$"])
         >>> [1, 31, 27, 6, 49, 35, 2]
     """
+    if isinstance(text, str):
+        text = text.split()
     return [_symbol_to_id[s] for s in text]
 
 

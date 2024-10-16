@@ -1,0 +1,14 @@
+data_root: /path/to/data_root
+
+wav_dir: ${.data_root}/wav
+alignment_dir: ${.data_root}/alignment
+transcription_dir: ${.data_root}/transcription
+
+crop_wav_dir: ${.data_root}/crop_wav
+
+df_dir: ${.data_root}/df
+train_df_file: ${.df_dir}/train.csv
+valid_df_file: ${.df_dir}/valid.csv
+
+cf0_dir: ${.data_root}/cf0
+vuv_dir: ${.data_root}/vuv

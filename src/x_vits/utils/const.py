@@ -10,13 +10,21 @@ class LANGUAGE(Enum):
     ENGLISH = "EN"
     JAPANESE = "JA"
 
+    @classmethod
+    def from_str(self, s):
+        return dict(
+            EN=LANGUAGE.ENGLISH,
+            JA=LANGUAGE.JAPANESE,
+        )[s]
+
 
 class PreprocessType(Enum):
     JSUT = "JSUT"
+    LJSPEECH = "LJSPEECH"
 
     @classmethod
     def from_str(self, s):
-        if s == "JSUT":
-            return PreprocessType.JSUT
-        else:
-            raise ValueError(f"Unknown preprocess type: {s}")
+        return dict(
+            JSUT=PreprocessType.JSUT,
+            LJSPEECH=PreprocessType.LJSPEECH,
+        )[s]

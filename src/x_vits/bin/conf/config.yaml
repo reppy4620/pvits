@@ -1,11 +1,11 @@
 defaults:
   - _self_
-  - path: default
+  - path: jsut
   - train: default
   - mel: default
   - generator: xvits
   - discriminator: bigvgan
-  - dataset: single
+  - dataset: single_ja
   - optimizer: adamw
   - scheduler: exponential
   - lit_module: xvits
@@ -22,6 +22,7 @@ preprocess:
   overwrite: true
   n_jobs: 8
   sil_sec: 0.02
+  valid_ratio: 0.02
 
 train:
   out_dir: ./out

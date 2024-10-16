@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import pyworld as pw
 import soundfile as sf
+import tgt
 from joblib import Parallel, delayed
 
 from x_vits.frontend.ja import phonemes, pp_symbols
@@ -17,6 +18,8 @@ from x_vits.utils.tqdm import tqdm_joblib
 def main(cfg):
     if PreprocessType.from_str(cfg.preprocess.type) == PreprocessType.JSUT:
         jsut_preprocess(cfg)
+    elif PreprocessType.from_str(cfg.preprocess.type) == PreprocessType.LJSPEECH:
+        ljspeech_preprocess(cfg)
     else:
         raise ValueError(f"Invalid preprocess type: {cfg.preprocess.type}")
 
@@ -117,7 +120,101 @@ def jsut_preprocess(cfg):
         out = Parallel(n_jobs=cfg.preprocess.n_jobs)(delayed(_process)(f) for f in wav_files)
 
     assert len(out) == len(wav_files)
-    valid_size = int(len(wav_files) * 0.02)
+    valid_size = int(len(wav_files) * cfg.preprocess.valid_ratio)
+    df = pd.DataFrame(
+        list(sorted(out, key=lambda x: x[0])),
+        columns=["bname", "label", "duration", "frame_length", "raw_text"],
+    )
+    df.to_csv(f"{cfg.path.df_dir}/all.csv", index=False)
+    train_df = df.iloc[valid_size:]
+    valid_df = df.iloc[:valid_size]
+    train_df.to_csv(cfg.path.train_df_file, index=False)
+    valid_df.to_csv(cfg.path.valid_df_file, index=False)
+
+    with open(f"{cfg.path.data_root}/done", "w") as f:
+        f.write("done")
+
+
+def ljspeech_preprocess(cfg):
+    if not cfg.preprocess.overwrite and Path(f"{cfg.path.data_root}/done").exists():
+        logger.info("Already processed.")
+        return
+
+    wav_dir = Path(cfg.path.wav_dir)
+    alignment_dir = Path(cfg.path.alignment_dir)
+    transcription_dir = Path(cfg.path.transcription_dir)
+
+    # Create directories
+    [
+        Path(d).mkdir(parents=True, exist_ok=True)
+        for d in [
+            cfg.path.crop_wav_dir,
+            cfg.path.df_dir,
+            cfg.path.cf0_dir,
+            cfg.path.vuv_dir,
+        ]
+    ]
+
+    logger.info("Start Processing...")
+
+    wav_files = list(sorted(wav_dir.glob("*.wav")))
+
+    def _process(wav_file):
+        bname = wav_file.stem
+        textgrid = tgt.io.read_textgrid(
+            alignment_dir / f"{bname}.TextGrid",
+            include_empty_intervals=True,
+        )
+        textgrid_tier = textgrid.get_tier_by_name("phones")
+        label = []
+        durations = []
+        for t in textgrid_tier._objects:
+            text = t.text
+            if len(text) == 0 or text == " ":
+                text = "sp"
+            label.append(text)
+            duration = (t.end_time - t.start_time) * cfg.mel.sample_rate / cfg.mel.hop_length
+            durations.append(duration)
+        assert len(label) == len(durations)
+
+        wav, sr = sf.read(wav_file)
+        assert sr == cfg.mel.sample_rate
+        f0, _ = pw.harvest(wav, sr, frame_period=cfg.mel.hop_length / cfg.mel.sample_rate * 1e3)
+        vuv = (f0 != 0).astype(np.float32)
+        x = np.arange(len(f0))
+        idx = np.nonzero(f0)
+        cf0 = np.interp(x, x[idx], f0[idx])
+        np.save(f"{cfg.path.cf0_dir}/{bname}.npy", cf0)
+        np.save(f"{cfg.path.vuv_dir}/{bname}.npy", vuv)
+
+        frame_length = len(wav) // cfg.mel.hop_length
+        round_durations = np.round(durations)
+        diff_length = np.sum(round_durations) - frame_length
+        if diff_length != 0:
+            if diff_length > 0:
+                durations_diff = round_durations - durations
+                delta = -1
+            else:  # diff_length < 0
+                durations_diff = durations - round_durations
+                delta = 1
+            sort_dur_idx = np.argsort(durations_diff)[::-1]
+            for i, idx in enumerate(sort_dur_idx, start=1):
+                round_durations[idx] += delta
+                if i == abs(diff_length):
+                    break
+            assert np.sum(round_durations) == frame_length
+        label = " ".join(label)
+        duration = " ".join([str(int(d)) for d in round_durations])
+
+        with open(transcription_dir / f"{bname}.txt", "r") as f:
+            raw_text = f.readline().strip()
+        return bname, label, duration, frame_length, raw_text
+
+    with tqdm_joblib(len(wav_files)):
+        out = Parallel(n_jobs=cfg.preprocess.n_jobs)(delayed(_process)(f) for f in wav_files)
+
+    assert len(out) == len(wav_files)
+    valid_size = int(len(wav_files) * cfg.preprocess.valid_ratio)
     df = pd.DataFrame(
         list(sorted(out, key=lambda x: x[0])),
         columns=["bname", "label", "duration", "frame_length", "raw_text"],
