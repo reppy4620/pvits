@@ -1,14 +1,14 @@
 x-vits(WIP)
 ===
 
-This repository contains experiments to confirm the performance of PeriodVITS, but not limited to it.
+This repository contains experiments to confirm the performance of PeriodVITS, but not limited to it.  
 Now only supports JSUT and LJSpeech corpus.
 
 Main model is some modification version of PeriodVITS.
 - PeriodVITS
     - +deberta hidden representations to text encoder incorporated with cross attention
-    - +style encoder with style diffusion like StyleTTS2 but not using AdaLN now
-    - +multi-stream bigvgan with bigvgan-v1 discriminator
+    - +style encoder with style diffusion(for predicting style vector in inference time) like StyleTTS2 but not using AdaLN now
+    - +multi-band bigvgan with bigvgan-v1 discriminator
 
 **Note that the generated speech is not audible, but I cannot find the cause.**
 
@@ -29,6 +29,13 @@ Main model is some modification version of PeriodVITS.
   pages={1--5},
   year={2023},
   organization={IEEE}
+}
+@inproceedings{lee2023bigvgan,
+    title={Big{VGAN}: A Universal Neural Vocoder with Large-Scale Training},
+    author={Sang-gil Lee and Wei Ping and Boris Ginsburg and Bryan Catanzaro and Sungroh Yoon},
+    booktitle={The Eleventh International Conference on Learning Representations },
+    year={2023},
+    url={https://openreview.net/forum?id=iTtGCMDEzS_}
 }
 @inproceedings{li2023styletts,
     title={Style{TTS} 2: Towards Human-Level Text-to-Speech through Style Diffusion and Adversarial Training with Large Speech Language Models},
