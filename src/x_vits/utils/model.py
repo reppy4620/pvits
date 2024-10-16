@@ -29,7 +29,7 @@ def length_to_mask(length, max_length=None):
 
 def generate_path(duration, mask):
     b, t_x, t_y = mask.shape
-    cum_duration = torch.cumsum(duration, 1)
+    cum_duration = torch.cumsum(duration, dim=-1)
 
     cum_duration_flat = cum_duration.view(b * t_x)
     path = length_to_mask(cum_duration_flat, t_y).to(mask.dtype)

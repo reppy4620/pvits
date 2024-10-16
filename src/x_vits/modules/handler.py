@@ -46,7 +46,7 @@ class DurationHandler(nn.Module):
         y_lengths = duration.sum(dim=[1, 2]).clamp_min(1).long()
         y_mask = length_to_mask(y_lengths).unsqueeze(1).to(x_mask.dtype)
         attn_mask = (x_mask.unsqueeze(-1) * y_mask.unsqueeze(2)).squeeze(1)
-        attn = generate_path(duration, attn_mask)
+        attn = generate_path(duration.squeeze(1), attn_mask)
         x_frame = x @ attn
         output = DurationHandlerOutput(
             x_frame=x_frame,
@@ -104,7 +104,7 @@ class SupervisedDurationHandler(DurationHandler):
         y_mask = length_to_mask(mel_lengths).unsqueeze(1).to(x_mask.dtype)
         attn_mask = torch.unsqueeze(x_mask, 2) * torch.unsqueeze(y_mask, -1)
         attn_mask = (x_mask.unsqueeze(-1) * y_mask.unsqueeze(2)).squeeze(1)
-        attn = generate_path(duration, attn_mask)
+        attn = generate_path(duration.squeeze(1), attn_mask)
 
         x_frame = x @ attn
         log_duration = to_log_scale(duration)

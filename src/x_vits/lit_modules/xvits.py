@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 
-from x_vits.layers import LearnablePQMF
+from x_vits.layers import PQMF
 from x_vits.losses import (
     MultiResolutionSTFTLoss,
     discriminator_loss,
@@ -17,7 +17,7 @@ class XVITSModule(LitModuleBase):
     def __init__(self, params):
         super().__init__(params)
         self.stft_loss = MultiResolutionSTFTLoss()
-        self.pqmf = LearnablePQMF()
+        self.pqmf = PQMF()
 
     def _handle_batch(self, batch, batch_idx, train):
         optimizer_g, optimizer_d = self.optimizers()
