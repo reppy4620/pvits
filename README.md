@@ -1,11 +1,13 @@
-x-vits(WIP)
+x-vits
 ===
 
 This repository contains experiments to confirm the performance of PeriodVITS, but not limited to it.  
-Now only supports JSUT and LJSpeech corpus.
+The focus of this repository is on small and high-quality models that can be trained on a single consumer GPU, such as the RTX3090 or 4090.  
+Now only supports JSUT and LJSpeech corpus.  
 
-Main model is some modification version of PeriodVITS.
+The model is some modification version of PeriodVITS.
 - PeriodVITS
+    - +roformer(like llama3) text encoder
     - +deberta hidden representations to text encoder incorporated with cross attention
     - +style encoder with style diffusion(for predicting style vector in inference time) like StyleTTS2 but not using AdaLN now
     - +multi-band bigvgan with bigvgan-v1 discriminator

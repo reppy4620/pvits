@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from x_vits.losses import ForwardSumLoss, kl_loss
+from x_vits.losses import kl_loss
 from x_vits.modules.handler import DurationHandlerOutput
 from x_vits.utils.model import rand_slice_segments, slice_segments, to_log_scale
 
@@ -35,8 +35,6 @@ class PeriodVITS(nn.Module):
 
         self.spec_tfm = spec_tfm
         self.segment_size = segment_size
-
-        self.forward_sum_loss = ForwardSumLoss()
 
     def training_step(
         self,
@@ -88,15 +86,10 @@ class PeriodVITS(nn.Module):
         loss_dict = loss_dict | dict(cf0=loss_cf0, vuv=loss_vuv, kl=loss_kl)
         return o, ids_slice, p_attn, loss_dict
 
-    def forward(self, inputs, noise_scale=0.667):
-        device = next(self.parameters()).device
-        _, x, *_, raw_text = inputs
-        x = x.unsqueeze(0).to(device)
-        x_lengths = torch.tensor([x.shape[-1]], dtype=torch.long, device=device)
+    def forward(self, x, x_lengths, raw_texts, noise_scale=0.667):
         x, x_mask = self.text_encoder(x, x_lengths)
 
         x_frame, p_attn, duration, y_mask, _ = self.duration_handler.infer(x, x_mask)
-
         x_frame, m_p, logs_p = self.frame_prior_network(x_frame, y_mask)
         pitch_pred = self.pitch_predictor(x_frame * y_mask, y_mask)
         log_cf0_pred, vuv_logit_pred = pitch_pred.chunk(2, dim=1)

@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from x_vits.losses import ForwardSumLoss, kl_loss
+from x_vits.losses import kl_loss
 from x_vits.modules.handler import DurationHandlerOutput
 from x_vits.utils.model import rand_slice_segments, slice_segments, to_log_scale
 
@@ -46,8 +46,6 @@ class XVITS(nn.Module):
         self.ref_segment_size = ref_segment_size
         if self.style_encoder:
             self.style_dim = style_encoder.style_dim
-
-        self.forward_sum_loss = ForwardSumLoss()
 
     def training_step(
         self,
@@ -129,20 +127,16 @@ class XVITS(nn.Module):
         )
         return o, o_mb, ids_slice, p_attn, loss_dict
 
-    def forward(self, inputs, noise_scale=0.667):
-        device = next(self.parameters()).device
-        _, x, *_, raw_text = inputs
-        x = x.unsqueeze(0).to(device)
-        x_lengths = torch.tensor([x.shape[-1]], dtype=torch.long, device=device)
+    def forward(self, x, x_lengths, raw_texts, noise_scale=0.667):
         context, context_lengths = (
-            self.context_embedder([raw_text]) if self.context_embedder else (None, None)
+            self.context_embedder(raw_texts) if self.context_embedder else (None, None)
         )
         x, x_mask = self.text_encoder(
             x, x_lengths, context=context, context_lengths=context_lengths
         )
         if self.style_diffusion:
             cond = self.style_diffusion.sampler(
-                torch.randn(x.size(0), 1, self.style_dim, device=device),
+                torch.randn(x.size(0), 1, self.style_dim, device=x.device),
                 num_steps=5,
                 embedding=x.transpose(-1, -2),
                 embedding_scale=1.0,

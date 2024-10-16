@@ -24,7 +24,7 @@ class AttentionLayer(nn.Module):
         k = self.w_k(x).reshape(b, t, self.num_heads, c // self.num_heads).transpose(1, 2)
         v = self.w_v(x).reshape(b, t, self.num_heads, c // self.num_heads).transpose(1, 2)
 
-        q, k = self.rotary_emb.rotate_queries_and_keys(q, k, seq_dim=2)
+        q, k = self.rotary_emb.rotate_queries_and_keys(q, k)
         dropout_p = self.dropout_p if self.training else 0.0
         scores = q @ k.transpose(-2, -1) / c**0.5
         scores = scores.masked_fill(attn_mask == 0, -1e4)

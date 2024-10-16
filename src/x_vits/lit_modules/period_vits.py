@@ -12,6 +12,19 @@ from .base import LitModuleBase
 
 
 class PeriodVITSModule(LitModuleBase):
+    def forward(self, inputs):
+        # single inference
+        if isinstance(inputs[0], str):
+            _, phoneme, *_ = inputs
+            phoneme = phoneme.unsqueeze(0).to(self.device)
+            phone_lengths = torch.tensor([phoneme.size(1)], device=self.device)
+        # batch inference
+        else:
+            _, phonemes, *_, phone_lengths, _, _, _ = inputs
+            phonemes, phone_lengths = phonemes.to(self.device), phone_lengths.to(self.device)
+        o, _ = self.net_g(phonemes, phone_lengths)
+        return o.squeeze(1)
+
     def _handle_batch(self, batch, batch_idx, train):
         optimizer_g, optimizer_d = self.optimizers()
         (
@@ -24,8 +37,8 @@ class PeriodVITSModule(LitModuleBase):
             y,
             x_lengths,
             spec_lengths,
-            _,  # y_lengths
-            _,
+            _,  # sample_lengths
+            _,  # raw_texts
         ) = batch
         y_hat, ids_slice, p_attn, loss_dict = self.net_g.training_step(
             x, x_lengths, spec, spec_lengths, cf0, vuv, duration=duration
