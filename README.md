@@ -1,8 +1,8 @@
 x-vits(WIP)
 ===
 
-This repo contains experiments for confirming performance of PeriodVITS.  
-Now only supports JSUT corpus.
+This repository contains experiments to confirm the performance of PeriodVITS, but not limited to it.
+Now only supports JSUT and LJSpeech corpus.
 
 Main model is some modification version of PeriodVITS.
 - PeriodVITS

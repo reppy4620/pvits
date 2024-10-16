@@ -1,7 +1,7 @@
 train:
   _target_: x_vits.datasets.SingleSpeakerDataset
   df_file: ${...path.train_df_file}
-  wav_dir: ${...path.crop_wav_dir}
+  wav_dir: ${...path.wav_dir}
   cf0_dir: ${...path.cf0_dir}
   vuv_dir: ${...path.vuv_dir}
   spec_tfm: ${...mel}
@@ -10,7 +10,7 @@ train:
 valid: 
   _target_: x_vits.datasets.SingleSpeakerDataset
   df_file: ${...path.valid_df_file}
-  wav_dir: ${...path.crop_wav_dir}
+  wav_dir: ${...path.wav_dir}
   cf0_dir: ${...path.cf0_dir}
   vuv_dir: ${...path.vuv_dir}
   spec_tfm: ${...mel}
@@ -19,4 +19,4 @@ valid:
 collator: 
   _target_: x_vits.datasets.SingleSpeakerCollator
 
-max_tokens: 5000
+max_tokens: 4000
