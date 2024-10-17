@@ -1,4 +1,4 @@
-x-vits
+pvits
 ===
 
 This repository contains experiments to confirm the performance of PeriodVITS, but not limited to it.  
@@ -11,8 +11,6 @@ The model is some modification version of PeriodVITS.
     - +deberta hidden representations to text encoder incorporated with cross attention
     - +style encoder with style diffusion(for predicting style vector in inference time) like StyleTTS2 but not using AdaLN now
     - +multi-band bigvgan with bigvgan-v1 discriminator
-
-**Note that the generated speech is not audible, but I cannot find the cause.**
 
 # Citations
 ```

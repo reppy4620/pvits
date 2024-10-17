@@ -7,18 +7,6 @@ from x_vits.modules.alignment import viterbi_decode
 from x_vits.utils.model import generate_path, length_to_mask, to_log_scale
 
 
-class HardAlignmentUpsampler(nn.Module):
-    def forward(self, x, attn):
-        """Normal upsampler
-
-        Args:
-            x (torch.Tensor): [B, C, P]
-            attn (torch.Tensor): [B, P, T]
-
-        Returns:
-            torch.Tensor: [B, C, T]
-        """
-        return x @ attn
 
 
 class DurationHandlerOutput(NamedTuple):

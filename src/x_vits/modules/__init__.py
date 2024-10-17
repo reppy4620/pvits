@@ -1,4 +1,4 @@
-from .alignment import AlignmentModule, GaussianUpsampling, viterbi_decode
+from .alignment import AlignmentModule, GaussianUpsampling, HardAlignmentUpsampler, viterbi_decode
 from .diffusion import AudioDiffusionConditional, KDiffusion, LogNormalDistribution, Transformer1d
 from .embedder import ContextEmbedder
 from .encoder import PosteriorEncoder, StyleEncoder, TransformerTextEncoder
@@ -6,7 +6,6 @@ from .flow import VolumePreservingFlow
 from .frame_prior import FramePriorNetwork
 from .handler import (
     DurationHandlerOutput,
-    HardAlignmentUpsampler,
     SupervisedDurationHandler,
     UnsupervisedDurationHandler,
 )

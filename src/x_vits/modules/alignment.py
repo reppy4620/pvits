@@ -241,3 +241,17 @@ class GaussianUpsampling(torch.nn.Module):
         p_attn = torch.softmax(energy, dim=2)  # (B, T_feats, T_text)
         hs = torch.matmul(p_attn, hs)
         return hs, p_attn
+
+
+class HardAlignmentUpsampler(nn.Module):
+    def forward(self, x, attn):
+        """Normal upsampler
+
+        Args:
+            x (torch.Tensor): [B, C, P]
+            attn (torch.Tensor): [B, P, T]
+
+        Returns:
+            torch.Tensor: [B, C, T]
+        """
+        return x @ attn
