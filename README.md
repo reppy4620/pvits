@@ -1,4 +1,4 @@
-pvits
+x-vits
 ===
 
 This repository contains experiments to confirm the performance of PeriodVITS, but not limited to it.  

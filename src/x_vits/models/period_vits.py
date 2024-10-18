@@ -45,7 +45,6 @@ class PeriodVITS(nn.Module):
         cf0,
         vuv,
         duration=None,
-        raw_texts=None,
     ):
         mel = self.spec_tfm.spec_to_mel(spec)
         x, x_mask = self.text_encoder(x, x_lengths)
@@ -86,7 +85,7 @@ class PeriodVITS(nn.Module):
         loss_dict = loss_dict | dict(cf0=loss_cf0, vuv=loss_vuv, kl=loss_kl)
         return o, ids_slice, p_attn, loss_dict
 
-    def forward(self, x, x_lengths, raw_texts, noise_scale=0.667):
+    def forward(self, x, x_lengths, noise_scale=0.667):
         x, x_mask = self.text_encoder(x, x_lengths)
 
         x_frame, p_attn, duration, y_mask, _ = self.duration_handler.infer(x, x_mask)

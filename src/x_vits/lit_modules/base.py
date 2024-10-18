@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import torch
 from hydra.utils import instantiate
 from lightning import LightningModule
 from torch.utils.data import DataLoader
@@ -33,7 +34,16 @@ class LitModuleBase(LightningModule):
         self.valid_save_data = dict()
 
     def forward(self, inputs):
-        o, _ = self.net_g(inputs)
+        # single inference
+        if isinstance(inputs[0], str):
+            _, phoneme, *_ = inputs
+            phonemes = phoneme.unsqueeze(0).to(self.device)
+            phone_lengths = torch.tensor([phonemes.size(1)], device=self.device)
+        # batch inference
+        else:
+            _, phonemes, *_, phone_lengths, _, _, _ = inputs
+            phonemes, phone_lengths = phonemes.to(self.device), phone_lengths.to(self.device)
+        o, _ = self.net_g(phonemes, phone_lengths)
         return o.squeeze(1)
 
     def _handle_batch(self, batch, batch_idx, train):
