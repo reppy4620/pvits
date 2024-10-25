@@ -22,8 +22,8 @@ class XVITSModule(LitModuleBase):
     def forward(self, inputs):
         if isinstance(inputs[0], str):
             _, phoneme, *_, raw_text = inputs
-            phoneme = phoneme.unsqueeze(0).to(self.device)
-            phone_lengths = torch.tensor([phoneme.size(1)], device=self.device)
+            phonemes = phoneme.unsqueeze(0).to(self.device)
+            phone_lengths = torch.tensor([phonemes.size(1)], device=self.device)
             raw_texts = [raw_text]
         else:
             _, phonemes, *_, phone_lengths, _, _, raw_texts = inputs
