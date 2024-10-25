@@ -58,31 +58,31 @@ class LitModuleBase(LightningModule):
 
     def validation_step(self, batch, batch_idx):
         mels, wavs, p_attns = self._handle_batch(batch, batch_idx, train=False)
-        if batch_idx == 0:
-            self.valid_save_data["mel"] = mels[0].squeeze().detach().cpu().float()
-            self.valid_save_data["wav"] = wavs[0].squeeze().detach().cpu().float()
-            self.valid_save_data["p_attn"] = p_attns[0].squeeze().detach().cpu().float()
+        # if batch_idx == 0:
+        #     self.valid_save_data["mel"] = mels[0].squeeze().detach().cpu().float()
+        #     self.valid_save_data["wav"] = wavs[0].squeeze().detach().cpu().float()
+        #     self.valid_save_data["p_attn"] = p_attns[0].squeeze().detach().cpu().float()
 
     def on_validation_epoch_end(self):
-        tb_logger = self.loggers[1]
-        # wandb_logger = self.loggers[2]
+        # tb_logger = self.loggers[1]
+        # # wandb_logger = self.loggers[2]
 
-        mel = self.valid_save_data["mel"]
-        wav = self.valid_save_data["wav"].unsqueeze(0)
-        p_attn = self.valid_save_data["p_attn"]
+        # mel = self.valid_save_data["mel"]
+        # wav = self.valid_save_data["wav"].unsqueeze(0)
+        # p_attn = self.valid_save_data["p_attn"]
 
-        # Log to tensorboard
-        # audio
-        fig_mel = plt.figure(figsize=(10, 5))
-        plt.imshow(mel.numpy(), aspect="auto", origin="lower")
-        tb_logger.experiment.add_figure("mel", fig_mel, self.current_epoch)
-        tb_logger.experiment.add_audio("wav", wav, self.current_epoch, sample_rate=self.sample_rate)
-        plt.close()
-        # attention
-        fig_path = plt.figure(figsize=(10, 5))
-        plt.imshow(p_attn.numpy(), aspect="auto", origin="lower")
-        tb_logger.experiment.add_figure("p_attn", fig_path, self.current_epoch)
-        plt.close()
+        # # Log to tensorboard
+        # # audio
+        # fig_mel = plt.figure(figsize=(10, 5))
+        # plt.imshow(mel.numpy(), aspect="auto", origin="lower")
+        # tb_logger.experiment.add_figure("mel", fig_mel, self.current_epoch)
+        # tb_logger.experiment.add_audio("wav", wav, self.current_epoch, sample_rate=self.sample_rate)
+        # plt.close()
+        # # attention
+        # fig_path = plt.figure(figsize=(10, 5))
+        # plt.imshow(p_attn.numpy(), aspect="auto", origin="lower")
+        # tb_logger.experiment.add_figure("p_attn", fig_path, self.current_epoch)
+        # plt.close()
 
         # Log to wandb
         # audio
@@ -94,8 +94,8 @@ class LitModuleBase(LightningModule):
         # )
         # wandb_logger.log_image(key="p_attn", images=[p_attn.flip(0).numpy()])
 
-        self.valid_save_data.clear()
-        del mel, wav, p_attn
+        # self.valid_save_data.clear()
+        # del mel, wav, p_attn
 
         logger.info(", ".join(f"{k}={v:.3f}" for k, v in self.trainer.logged_metrics.items()))
 
@@ -115,6 +115,7 @@ class LitModuleBase(LightningModule):
             pin_memory=True,
             collate_fn=self.collator,
             batch_sampler=batch_sampler,
+            persistent_workers=True,
         )
         return train_dl
 

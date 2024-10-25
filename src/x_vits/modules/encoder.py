@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch.nn.utils.parametrizations import spectral_norm
 
 from x_vits.layers import WaveNet
-from x_vits.modules.transformer import TransformerBlock
+from x_vits.modules.transformer import TransformerBlock, VITSTransformerBlock
 from x_vits.utils.model import length_to_mask
 
 
@@ -34,6 +34,7 @@ class TransformerTextEncoder(nn.Module):
         else:
             context_mask = None
             xattn_mask = None
+        x = x * mask
         for layer in self.layers:
             x = layer(
                 x,
@@ -42,8 +43,33 @@ class TransformerTextEncoder(nn.Module):
                 context=context,
                 context_attn_mask=xattn_mask,
             )
+        x = x * mask
         x = self.out_layer(x) * mask
         x, mask = x.transpose(1, 2), mask.transpose(1, 2)
+        return x, mask
+
+
+class VITSTextEncoder(nn.Module):
+    def __init__(self, num_vocab, channels, num_layers, num_heads, dropout):
+        super().__init__()
+        self.scale = math.sqrt(channels)
+        self.embedding = nn.Embedding(num_vocab, channels)
+        nn.init.normal_(self.embedding.weight, 0.0, channels**-0.5)
+        self.layers = nn.ModuleList(
+            [VITSTransformerBlock(channels, num_heads, dropout) for _ in range(num_layers)]
+        )
+        self.out_layer = nn.Conv1d(channels, channels, 1)
+
+    def forward(self, x, x_lengths):
+        x = self.embedding(x) * self.scale
+        x = x.transpose(1, 2)
+        mask = length_to_mask(x_lengths).unsqueeze(1).type_as(x)
+        attn_mask = mask.unsqueeze(-1) * mask.unsqueeze(1)
+        x = x * mask
+        for layer in self.layers:
+            x = layer(x, mask, attn_mask)
+        x = x * mask
+        x = self.out_layer(x) * mask
         return x, mask
 
 

@@ -1,6 +1,14 @@
 import torch.nn as nn
 
-from x_vits.layers import AdaRMSNorm, AttentionLayer, CrossAttentionLayer, FeedForwardLayer
+from x_vits.layers import (
+    AdaRMSNorm,
+    AttentionLayer,
+    ChannelFirstLayerNorm,
+    CrossAttentionLayer,
+    FeedForwardLayer,
+    RelativeMultiHeadAttentionLayer,
+    VITSFeedForwardLayer,
+)
 
 
 class TransformerBlock(nn.Module):
@@ -56,4 +64,25 @@ class AdaTransformerBlock(TransformerBlock):
                 self.xattn_norm(x, cond=cond), context=context, attn_mask=context_attn_mask
             )
             x = x + x_gate * self.xff(self.xff_norm(x, cond=cond), x_mask)
+        return x
+
+
+class VITSTransformerBlock(nn.Module):
+    def __init__(self, channels, num_heads, dropout_p):
+        super().__init__()
+
+        self.attn = RelativeMultiHeadAttentionLayer(channels, num_heads, dropout_p)
+        self.norm_attn = ChannelFirstLayerNorm(channels)
+        self.ff = VITSFeedForwardLayer(channels, dropout_p)
+        self.norm_ff = ChannelFirstLayerNorm(channels)
+        self.dropout = nn.Dropout(dropout_p)
+
+    def forward(self, x, x_mask, attn_mask):
+        y = self.attn(x, attn_mask)
+        y = self.dropout(x)
+        x = self.norm_attn(x + y)
+
+        y = self.ff(x, x_mask)
+        y = self.dropout(y)
+        x = self.norm_ff(x + y)
         return x

@@ -11,3 +11,4 @@ wheels/
 
 # user
 **/out*
+test.py

@@ -34,15 +34,15 @@ def main(cfg):
     lit_module: LightningModule = instantiate(cfg.lit_module, params=cfg, _recursive_=False)
 
     csv_logger = CSVLogger(save_dir=out_dir, name="logs/csv")
-    tb_logger = TensorBoardLogger(save_dir=out_dir, name="logs/tensorboard")
-    name = (
-        out_dir.absolute().parent.parent.parent.name + "/" + out_dir.absolute().parent.parent.name
-    )
-    wandb_logger = WandbLogger(
-        save_dir=out_dir,
-        name=name,
-        project="x-vits",
-    )
+    # tb_logger = TensorBoardLogger(save_dir=out_dir, name="logs/tensorboard")
+    # name = (
+    #     out_dir.absolute().parent.parent.parent.name + "/" + out_dir.absolute().parent.parent.name
+    # )
+    # wandb_logger = WandbLogger(
+    #     save_dir=out_dir,
+    #     name=name,
+    #     project="x-vits",
+    # )
     ckpt_callback = ModelCheckpoint(
         dirpath=ckpt_dir,
         every_n_train_steps=cfg.train.save_ckpt_interval,
@@ -52,7 +52,7 @@ def main(cfg):
     ckpt_path = ckpt_dir / "last.ckpt" if (ckpt_dir / "last.ckpt").exists() else None
 
     trainer = Trainer(
-        logger=[csv_logger, tb_logger, wandb_logger],
+        logger=[csv_logger],
         max_steps=cfg.train.num_steps,
         callbacks=[ckpt_callback, RichModelSummary(), RichProgressBar()],
         **cfg.train.trainer_args,

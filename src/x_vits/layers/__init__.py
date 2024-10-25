@@ -11,7 +11,13 @@ from .norm import (
 from .nsf import SourceModuleHnNSF
 from .pe import PositionalEncoding
 from .pqmf import PQMF, LearnablePQMF
-from .transformer import AttentionLayer, CrossAttentionLayer, FeedForwardLayer
+from .transformer import (
+    AttentionLayer,
+    CrossAttentionLayer,
+    FeedForwardLayer,
+    RelativeMultiHeadAttentionLayer,
+    VITSFeedForwardLayer,
+)
 from .wavenet import WaveNet
 
 __all__ = [
@@ -26,10 +32,12 @@ __all__ = [
     "ChannelFirstRMSNorm",
     "AttentionLayer",
     "CrossAttentionLayer",
+    "RelativeMultiHeadAttentionLayer",
     "FeedForwardLayer",
     "SourceModuleHnNSF",
     "PositionalEncoding",
     "PQMF",
     "LearnablePQMF",
     "WaveNet",
+    "VITSFeedForwardLayer",
 ]
