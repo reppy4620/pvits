@@ -1,7 +1,7 @@
 seed: 42
 
-num_steps: 1000000
-save_ckpt_interval: 100000
+num_steps: 2000000
+save_ckpt_interval: 200000
 
 batch_size: 4
 num_workers: 4

@@ -156,4 +156,4 @@ class XVITS(nn.Module):
         z_p = m_p + torch.randn_like(m_p) * torch.exp(logs_p) * noise_scale
         z = self.flow.reverse(z_p * y_mask, y_mask, cond=cond)
         o, _ = self.vocoder(z * y_mask, f0, cond=cond)
-        return o, (p_attn, cf0, vuv, duration)
+        return o, (p_attn, f0, cf0, vuv, duration)

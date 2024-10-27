@@ -38,13 +38,13 @@ class LitModuleBase(LightningModule):
         if isinstance(inputs[0], str):
             _, phoneme, *_ = inputs
             phonemes = phoneme.unsqueeze(0).to(self.device)
-            phone_lengths = torch.tensor([phonemes.size(1)], device=self.device)
+            phone_lengths = torch.tensor([phonemes.size(-1)], device=self.device)
         # batch inference
         else:
             _, phonemes, *_, phone_lengths, _, _, _ = inputs
             phonemes, phone_lengths = phonemes.to(self.device), phone_lengths.to(self.device)
-        o, _ = self.net_g(phonemes, phone_lengths)
-        return o.squeeze(1)
+        o, (_, f0, _, _, _) = self.net_g(phonemes, phone_lengths)
+        return o.squeeze(1), f0.squeeze(1)
 
     def _handle_batch(self, batch, batch_idx, train):
         raise NotImplementedError()

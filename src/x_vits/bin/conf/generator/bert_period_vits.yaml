@@ -70,6 +70,7 @@ vocoder:
 
 context_embedder:
   _target_: x_vits.modules.ContextEmbedder
+  language: JP
 
 spec_tfm: ${mel}
 segment_size: ${train.frame_segment_size}

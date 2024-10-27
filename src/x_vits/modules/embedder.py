@@ -8,12 +8,14 @@ from x_vits.utils.const import ENGLISH_BERT_MODEL_NAME, JAPANESE_BERT_MODEL_NAME
 class ContextEmbedder(nn.Module):
     def __init__(self, language=LANGUAGE.JAPANESE):
         super().__init__()
-        if language == LANGUAGE.JAPANESE:
+        lang = LANGUAGE.from_str(language)
+        if lang == LANGUAGE.JAPANESE:
             model_name = JAPANESE_BERT_MODEL_NAME
-        elif language == LANGUAGE.ENGLISH:
+        elif lang == LANGUAGE.ENGLISH:
             model_name = ENGLISH_BERT_MODEL_NAME
         else:
             raise ValueError(f"Invalid language: {language}")
+        print(f"Loading BERT model: {model_name}")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModel.from_pretrained(model_name).eval()
 

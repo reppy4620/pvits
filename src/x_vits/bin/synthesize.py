@@ -46,7 +46,7 @@ def main(cfg):
         bnames.append(bname)
         torch.cuda.synchronize()
         s = time.time()
-        o = lit_module(inputs)
+        o, _ = lit_module(inputs)
         torch.cuda.synchronize()
         rtf = (time.time() - s) / o.shape[-1] * cfg.mel.sample_rate
         rtf_list.append(rtf)

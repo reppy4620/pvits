@@ -8,7 +8,7 @@ ENGLISH_BERT_MODEL_NAME = "microsoft/deberta-v3-xsmall"
 
 class LANGUAGE(Enum):
     ENGLISH = "EN"
-    JAPANESE = "JA"
+    JAPANESE = "JP"
 
     @classmethod
     def from_str(self, s):
