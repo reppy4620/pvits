@@ -15,14 +15,18 @@ class ContextEmbedder(nn.Module):
         else:
             raise ValueError(f"Invalid language: {language}")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModel.from_pretrained(model_name)
+        self.model = AutoModel.from_pretrained(model_name).eval()
 
         self.register_buffer("dummy", torch.tensor(0))
+
+        for p in self.parameters():
+            p.requires_grad = False
 
     @property
     def device(self):
         return self.dummy.device
 
+    @torch.no_grad()
     def forward(self, raw_texts):
         inputs = self.tokenizer(raw_texts, return_tensors="pt", padding=True).to(self.device)
         context_lengths = inputs.attention_mask.sum(dim=1)

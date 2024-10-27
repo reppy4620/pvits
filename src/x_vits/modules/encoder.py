@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.utils.parametrizations import spectral_norm
+from torch.nn.utils.rnn import pack_padded_sequence
 
 from x_vits.layers import WaveNet
 from x_vits.modules.transformer import TransformerBlock, VITSTransformerBlock
@@ -43,6 +44,43 @@ class TransformerTextEncoder(nn.Module):
                 context=context,
                 context_attn_mask=xattn_mask,
             )
+        x = x * mask
+        x = self.out_layer(x) * mask
+        x, mask = x.transpose(1, 2), mask.transpose(1, 2)
+        return x, mask
+
+
+class TransformerTextEncoderWithContext(nn.Module):
+    def __init__(self, num_vocab, channels, num_layers, num_heads, dropout, context_channels):
+        super().__init__()
+        self.scale = math.sqrt(channels)
+        self.embedding = nn.Embedding(num_vocab, channels)
+        nn.init.normal_(self.embedding.weight, 0.0, channels**-0.5)
+        self.layers = nn.ModuleList(
+            [TransformerBlock(channels, num_heads, dropout) for _ in range(num_layers)]
+        )
+        self.out_layer = nn.Linear(channels, channels)
+
+        self.lstm = nn.LSTM(
+            context_channels, channels, num_layers=1, batch_first=True, bidirectional=True
+        )
+        self.proj_lstm = nn.Linear(channels * 2, channels)
+
+    def forward(self, x, x_lengths, context, context_lengths):
+        x = self.embedding(x) * self.scale
+        mask = length_to_mask(x_lengths).unsqueeze(-1).type_as(x)
+        attn_mask = (mask * mask.transpose(1, 2)).unsqueeze(1)
+
+        packed_feat = pack_padded_sequence(
+            context, context_lengths.cpu(), batch_first=True, enforce_sorted=False
+        )
+        _, (c, _) = self.lstm(packed_feat)
+        c = torch.cat([c[0], c[1]], dim=-1)
+        c = self.proj_lstm(c).unsqueeze(1)
+        x = (x + c) * mask
+
+        for layer in self.layers:
+            x = layer(x, mask, attn_mask)
         x = x * mask
         x = self.out_layer(x) * mask
         x, mask = x.transpose(1, 2), mask.transpose(1, 2)

@@ -9,7 +9,7 @@ from x_vits.modules.handler import DurationHandlerOutput
 from x_vits.utils.model import rand_slice_segments, slice_segments, to_log_scale
 
 
-class PeriodVITS(nn.Module):
+class BertPeriodVITS(nn.Module):
     def __init__(
         self,
         text_encoder,
@@ -19,6 +19,7 @@ class PeriodVITS(nn.Module):
         flow,
         posterior_encoder,
         vocoder,
+        context_embedder,
         spec_tfm,
         segment_size,
     ):
@@ -31,7 +32,7 @@ class PeriodVITS(nn.Module):
         self.flow = flow
         self.posterior_encoder = posterior_encoder
         self.vocoder = vocoder
-        self.dec = vocoder
+        self.context_embedder = context_embedder
 
         self.spec_tfm = spec_tfm
         self.segment_size = segment_size
@@ -44,10 +45,12 @@ class PeriodVITS(nn.Module):
         spec_lengths,
         cf0,
         vuv,
+        raw_text,
         duration=None,
     ):
         mel = self.spec_tfm.spec_to_mel(spec)
-        x, x_mask = self.text_encoder(x, x_lengths)
+        context, context_lengths = self.context_embedder(raw_text)
+        x, x_mask = self.text_encoder(x, x_lengths, context, context_lengths)
 
         duration_handler_output: DurationHandlerOutput = self.duration_handler(
             x=x,
@@ -85,8 +88,9 @@ class PeriodVITS(nn.Module):
         loss_dict = loss_dict | dict(cf0=loss_cf0, vuv=loss_vuv, kl=loss_kl)
         return o, ids_slice, p_attn, loss_dict
 
-    def forward(self, x, x_lengths, noise_scale=0.667):
-        x, x_mask = self.text_encoder(x, x_lengths)
+    def forward(self, x, x_lengths, raw_text, noise_scale=0.667):
+        context, context_lengths = self.context_embedder(raw_text)
+        x, x_mask = self.text_encoder(x, x_lengths, context, context_lengths)
 
         x_frame, p_attn, duration, y_mask, _ = self.duration_handler.infer(x, x_mask)
         x_frame, m_p, logs_p = self.frame_prior_network(x_frame, y_mask)

@@ -1,7 +1,13 @@
 from .alignment import AlignmentModule, GaussianUpsampling, HardAlignmentUpsampler, viterbi_decode
 from .diffusion import AudioDiffusionConditional, KDiffusion, LogNormalDistribution, Transformer1d
 from .embedder import ContextEmbedder
-from .encoder import PosteriorEncoder, StyleEncoder, TransformerTextEncoder, VITSTextEncoder
+from .encoder import (
+    PosteriorEncoder,
+    StyleEncoder,
+    TransformerTextEncoder,
+    TransformerTextEncoderWithContext,
+    VITSTextEncoder,
+)
 from .flow import VolumePreservingFlow
 from .frame_prior import FramePriorNetwork
 from .handler import (
@@ -24,6 +30,7 @@ __all__ = [
     "Transformer1d",
     "ContextEmbedder",
     "PosteriorEncoder",
+    "TransformerTextEncoderWithContext",
     "VITSTextEncoder",
     "StyleEncoder",
     "TransformerTextEncoder",

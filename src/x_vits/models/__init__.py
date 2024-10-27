@@ -1,3 +1,4 @@
+from .bert_period_vits import BertPeriodVITS
 from .discriminator import (
     CombinedDiscriminator,
     MultiPeriodDiscriminator,
@@ -14,4 +15,5 @@ __all__ = [
     "CombinedDiscriminator",
     "MultiPeriodDiscriminator",
     "PeriodVITS",
+    "BertPeriodVITS",
 ]

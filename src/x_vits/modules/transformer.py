@@ -15,16 +15,16 @@ class TransformerBlock(nn.Module):
     def __init__(self, channels, num_heads, dropout_p, context_channels=0):
         super().__init__()
 
-        self.attn_norm = nn.LayerNorm(channels)
+        self.attn_norm = nn.RMSNorm(channels)
         self.attn = AttentionLayer(channels, num_heads, dropout_p)
-        self.ff_norm = nn.LayerNorm(channels)
+        self.ff_norm = nn.RMSNorm(channels)
         self.ff = FeedForwardLayer(channels, dropout_p)
 
         self.with_cross = context_channels > 0
         if self.with_cross:
-            self.xattn_norm = nn.LayerNorm(channels)
+            self.xattn_norm = nn.RMSNorm(channels)
             self.xattn = CrossAttentionLayer(channels, context_channels, num_heads, dropout_p)
-            self.xff_norm = nn.LayerNorm(channels)
+            self.xff_norm = nn.RMSNorm(channels)
             self.xff = FeedForwardLayer(channels, dropout_p)
 
     def forward(self, x, x_mask, attn_mask, context=None, context_attn_mask=None):

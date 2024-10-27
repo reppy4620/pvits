@@ -86,7 +86,7 @@ class XVITS(nn.Module):
         x_frame, m_p, logs_p = self.frame_prior_network(x_frame, y_mask, cond=cond)
         pitch_pred = self.pitch_predictor(x_frame, y_mask, cond=cond)
         log_cf0_pred, vuv_logit_pred = pitch_pred.chunk(2, dim=1)
-        vuv_pred = vuv_logit_pred.sigmoid()
+        vuv_pred = vuv_logit_pred.sigmoid() * y_mask
 
         z, m_q, logs_q = self.posterior_encoder(spec, y_mask, cond=cond)
         z_p = self.flow(z, y_mask, cond=cond)

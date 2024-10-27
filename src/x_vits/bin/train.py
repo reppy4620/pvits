@@ -8,7 +8,7 @@ from lightning.pytorch.callbacks import (
     RichModelSummary,
     RichProgressBar,
 )
-from lightning.pytorch.loggers import CSVLogger, TensorBoardLogger, WandbLogger
+from lightning.pytorch.loggers import CSVLogger
 from omegaconf import OmegaConf
 
 from x_vits.utils.logging import logger
@@ -34,15 +34,6 @@ def main(cfg):
     lit_module: LightningModule = instantiate(cfg.lit_module, params=cfg, _recursive_=False)
 
     csv_logger = CSVLogger(save_dir=out_dir, name="logs/csv")
-    # tb_logger = TensorBoardLogger(save_dir=out_dir, name="logs/tensorboard")
-    # name = (
-    #     out_dir.absolute().parent.parent.parent.name + "/" + out_dir.absolute().parent.parent.name
-    # )
-    # wandb_logger = WandbLogger(
-    #     save_dir=out_dir,
-    #     name=name,
-    #     project="x-vits",
-    # )
     ckpt_callback = ModelCheckpoint(
         dirpath=ckpt_dir,
         every_n_train_steps=cfg.train.save_ckpt_interval,

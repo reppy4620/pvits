@@ -1,12 +1,13 @@
-_target_: x_vits.models.PeriodVITS
+_target_: x_vits.models.BertPeriodVITS
 
 text_encoder:
-  _target_: x_vits.modules.TransformerTextEncoder
+  _target_: x_vits.modules.TransformerTextEncoderWithContext
   num_vocab: 100
   channels: 192
   num_layers: 6
   num_heads: 2
   dropout: 0.1
+  context_channels: 384
   
 duration_handler:
   _target_: x_vits.modules.SupervisedDurationHandler
@@ -66,6 +67,9 @@ vocoder:
   sample_rate: ${...mel.sample_rate}
   hop_length: ${...mel.hop_length}
   harmonic_num: 8
+
+context_embedder:
+  _target_: x_vits.modules.ContextEmbedder
 
 spec_tfm: ${mel}
 segment_size: ${train.frame_segment_size}
